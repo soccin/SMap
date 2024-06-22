@@ -5,7 +5,7 @@
 From [nextflow](https://www.nextflow.io/) web page
 
 ```
-cd adagio/bin
+cd bin
 curl -s https://get.nextflow.io | bash
 ```
 
