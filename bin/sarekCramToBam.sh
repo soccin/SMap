@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# BSUB: -n 20 -R cmorsc1 -W 12:00
+
 SDIR=$(dirname "$(readlink -f "$0")")
 
 module load samtools
@@ -24,7 +26,7 @@ SM=$(
 ODIR=$ODIR/$SM
 mkdir -p $ODIR
 
-GENOME=$($SDIR/bin/getGenomeBuildBAM.sh $CRAM)
+GENOME=$($SDIR/getGenomeBuildBAM.sh $CRAM)
 
 case $GENOME in
 
