@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# BSUB: -n 20 -R cmorsc1 -W 12:00
+# BSUB: -o LSF/ -J C2B -n 18 -W 12:00 -R cmorsc1
+
+if [ "$#" != "1" ]; then
+    echo -e "\n\tusage: sarekCramToBam.sh FILE.cram\n"
+    exit
+fi
 
 SDIR=$(dirname "$(readlink -f "$0")")
 
@@ -41,6 +46,6 @@ case $GENOME in
 
 esac
 
-samtools view -@ 20 -T $GENOME_FILE -b $CRAM > $ODIR/${SM}.smap.bam
-samtools index -@ 20 $ODIR/${SM}.smap.bam
+samtools view -@ 16 -T $GENOME_FILE -b $CRAM -o $ODIR/${SM}.smap.bam
+samtools index -@ 16 $ODIR/${SM}.smap.bam
 
