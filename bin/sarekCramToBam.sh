@@ -39,6 +39,10 @@ case $GENOME in
     GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/b37/b37.fasta
     ;;
 
+    GRC_m38)
+    GENOME_FILE=/rtsess01/compute/juno/bic/ROOT/rscr/references/Mus_musculus/BIC_MSK/GRCm38/Sequence/WholeGenomeFasta/GRCm38.fa
+    ;;
+
     *)
     echo -e "\n\nUNKNOWN GENOME=[${GENOME}]\n\n"
     exit
