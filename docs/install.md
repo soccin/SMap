@@ -11,9 +11,10 @@ curl -s https://get.nextflow.io | bash
 
 ## Sarek
 
-Clone the nf-core/sarek repo version 3.4.2
+Clone my private copy of sarek which has juno
+specific tweaks and pre-released bug fixes
 
 ```
-git clone -b 3.4.2 git@github.com:nf-core/sarek.git
+git clone https://github.com/soccin/sarek
 ```
 
