@@ -11,10 +11,11 @@ curl -s https://get.nextflow.io | bash
 
 ## Sarek
 
-Clone my private copy of sarek which has juno
-specific tweaks and pre-released bug fixes
-
+Sarek is now a submodule make sure you clone with
+`clonesub` or `clone --recurse-submodules`.
+If you forgot then do
 ```
-git clone https://github.com/soccin/sarek
+git submodule update --init
+cd sarek
+git checkout master
 ```
-
