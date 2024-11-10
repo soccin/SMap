@@ -51,4 +51,4 @@ picardV2 CollectWgsMetrics \
     READ_LENGTH=$AVG_READ_LEN \
     USE_FAST_ALGORITHM=true \
     COVERAGE_CAP=1000 \
-    R=$GENOME_FILE I=$BAM O=$ODIR/$(basename ${BAM/.bam/.wgs.txt})
+    R=$GENOME_FILE I=$BAM O=$ODIR/$(basename ${BAM} | perl -pe 's/(.bam|.cram)$/.wgs.txt/'})
