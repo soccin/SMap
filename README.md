@@ -2,7 +2,7 @@
 
 Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples. 
 
-## Version: 2.0.1
+## Version: 2.0.3
 
 This version is using the devs branch of `soccin/sarek`. Stay on this branch so my work hopefully does not get broadcasted on the `nfcore/sarek` repo. This version of `sarek` is based on `v3.4.4` but fixes a bug that occurs with the latest version of nextflow.
 
