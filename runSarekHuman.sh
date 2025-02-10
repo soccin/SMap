@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
+OPWD=$(pwd -P)
 
 export NXF_SINGULARITY_CACHEDIR=/rtsess01/compute/juno/bic/ROOT/opt/singularity/cachedir_socci
 export TMPDIR=/scratch/socci
@@ -70,13 +71,55 @@ if [ "$GENOME" != "GATK.GRCh37" ] && [ "$GENOME" != "GATK.GRCh38" ]; then
 fi
 
 INPUT=$(realpath $1)
-   
-nextflow run $SDIR/sarek/main.nf -ansi-log false \
+LOG=runSarekHuman.log
+ODIR=sbam
+
+echo -e "GENOME: $GENOME" | tee -a $LOG
+echo -e "INPUT: $INPUT" | tee -a $LOG
+echo -e "ODIR: $ODIR" | tee -a $LOG
+
+#
+# Check if in backgroup or forground
+#
+# https://unix.stackexchange.com/questions/118462/how-can-a-bash-script-detect-if-it-is-running-in-the-background
+#
+
+case $(ps -o stat= -p $$) in
+  *+*) ANSI_LOG="true" ;;
+  *) ANSI_LOG="false" ;;
+esac
+
+nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     -profile singularity \
     -c $SDIR/config/neo.config \
     --genome $GENOME \
-    --outdir sbam \
+    --outdir $ODIR \
+    -resume \
+    --input $INPUT \
+    2> ${LOG/.log/.err} \
+    | tee -a $LOG
+
+mkdir -p $ODIR/runlog
+
+GTAG=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --long --tags --dirty="-UNCOMMITED" --always)
+GURL=$(git --git-dir=$SDIR/.git --work-tree=$SDIR config --get remote.origin.url)
+
+cat <<-END_VERSION > $ODIR/runlog/cmd.sh.log
+SDIR: $SDIR
+GURL: $GURL
+GTAG: $GTAG
+PWD: $OPWD
+TMPDIR: $TMPDIR
+NXF_SINGULARITY_CACHEDIR: $NXF_SINGULARITY_CACHEDIR
+
+Script: $0 $*
+
+nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
+    -profile singularity \
+    -c $SDIR/config/neo.config \
+    --genome $GENOME \
+    --outdir $ODIR \
     -resume \
     --input $INPUT
-
-
+    
+END_VERSION
