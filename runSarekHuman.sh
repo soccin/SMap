@@ -29,7 +29,7 @@ fi
 GENOME="GATK.GRCh37"  # Default genome
 
 # Parse command line arguments
-ARGS=$(getopt -o 'g:' --long 'genome:' -n 'runSarekHuman.sh' -- "$@")
+ARGS=$(getopt -o 'g:s' --long 'genome:,skip_bsqr' -n 'runSarekHuman.sh' -- "$@")
 
 if [ $? -ne 0 ]; then
     echo "Failed to parse arguments" >&2
@@ -39,11 +39,17 @@ fi
 eval set -- "$ARGS"
 unset ARGS
 
+ADDITIONAL_ARGS=""
 while true; do
     case "$1" in
         '-g'|'--genome')
             GENOME="$2"
             shift 2
+            continue
+            ;;
+        '-s'|'--skip_bsqr')
+            ADDITIONAL_ARGS="$ADDITIONAL_ARGS --skip_tools baserecalibrator"
+            shift
             continue
             ;;
         '--')
@@ -59,12 +65,12 @@ done
 
 if [ "$#" -ne "1" ]; then
     echo
-    echo "usage: runSarekHuman.sh [-g|--genome GATK.GRCh37|GATK.GRCh38] input_sarek.csv"
+    echo "usage: runSarekHuman.sh [-g|--genome GATK.GRCh37|GATK.GRCh38] [-s|--skip_bsqr] input_sarek.csv"
     echo
     exit
 fi
 
-if [ "$GENOME" != "GATK.GRCh37" ] && [ "$GENOME" != "GATK.GRCh38" ]; then
+if [ "$GENOME" != "GATK.GRCh37" ]  && [ "$GENOME" != "GATK.GRCh38" ]; then
     echo -e "\n\n   Invalid genome: $GENOME"
     echo -e "   Valid options are: GATK.GRCh37 or GATK.GRCh38\n\n"
     exit 1
@@ -96,6 +102,7 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --outdir $ODIR \
     -resume \
     --input $INPUT \
+    $ADDITIONAL_ARGS \
     2> ${LOG/.log/.err} \
     | tee -a $LOG
 
@@ -111,7 +118,7 @@ GTAG: $GTAG
 PWD: $OPWD
 TMPDIR: $TMPDIR
 NXF_SINGULARITY_CACHEDIR: $NXF_SINGULARITY_CACHEDIR
-
+ADDITIONAL_ARGS: $ADDITIONAL_ARGS
 Script: $0 $*
 
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
@@ -120,6 +127,7 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --genome $GENOME \
     --outdir $ODIR \
     -resume \
-    --input $INPUT
+    --input $INPUT \
+    $ADDITIONAL_ARGS
     
 END_VERSION
