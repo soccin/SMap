@@ -39,6 +39,10 @@ case $GENOME in
     GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/b37/b37.fasta
     ;;
 
+    GRCh38)
+    GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/GRCh38_1kg/GRCh38_full_analysis_set_plus_decoy_hla.fa
+    ;;
+
     GRC_m38)
     GENOME_FILE=/rtsess01/compute/juno/bic/ROOT/rscr/references/Mus_musculus/BIC_MSK/GRCm38/Sequence/WholeGenomeFasta/GRCm38.fa
     ;;

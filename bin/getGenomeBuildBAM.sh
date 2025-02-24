@@ -66,6 +66,11 @@ case $GENOME_MD5 in
     echo "GRC_m38"
     ;;
 
+    688157c599f72b79f8877cf96bf21fd9)
+    # GRCh38
+    echo "GRCh38"
+    ;;
+
     *)
     echo "unknown" $GENOME_MD5
     ;;
