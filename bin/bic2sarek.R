@@ -41,7 +41,9 @@ mfile=gsub("_sample_mapping.txt","_metadata_samples.csv",argv[1]) %>% gsub(".txt
 if(!file.exists(mfile)) {
     md=fdir %>% 
         select(sampleName=sample) %>%
-        mutate(cmoPatientId="",tumorOrNormal="Tumor|Normal")
+        mutate(cmoPatientId="",tumorOrNormal="Tumor|Normal") %>%
+        distinct(sampleName,cmoPatientId,tumorOrNormal) %>%
+        arrange(sampleName)
     MD_TEMPLATE=cc("TEMPLATE_",mfile)
     write_csv(md,MD_TEMPLATE)
     cat("\n\nMetadata file not found\n")
