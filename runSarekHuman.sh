@@ -3,9 +3,11 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 OPWD=$(pwd -P)
 
-export NXF_SINGULARITY_CACHEDIR=/rtsess01/compute/juno/bic/ROOT/opt/singularity/cachedir_socci
-export TMPDIR=/scratch/socci
+export NXF_SINGULARITY_CACHEDIR=/scratch/test01/socci/opt/singularity/cachedir
+export TMPDIR=/localscratch/socci
 export PATH=$SDIR/bin:$PATH
+
+NF_LOCAL_CONFIG=iris.config
 
 haveNextflow=$(which nextflow 2>/dev/null)
 
@@ -97,7 +99,7 @@ esac
 
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     -profile singularity \
-    -c $SDIR/config/neo.config \
+    -c $SDIR/config/$NF_LOCAL_CONFIG \
     --genome $GENOME \
     --outdir $ODIR \
     -resume \
@@ -123,7 +125,7 @@ Script: $0 $*
 
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     -profile singularity \
-    -c $SDIR/config/neo.config \
+    -c $SDIR/config/$NF_LOCAL_CONFIG \
     --genome $GENOME \
     --outdir $ODIR \
     -resume \
