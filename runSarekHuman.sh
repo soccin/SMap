@@ -3,9 +3,13 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 OPWD=$(pwd -P)
 
-export NXF_SINGULARITY_CACHEDIR=/scratch/test01/socci/opt/singularity/cachedir
-export TMPDIR=/localscratch/socci
 export PATH=$SDIR/bin:$PATH
+export NXF_SINGULARITY_CACHEDIR=/scratch/test01/socci/opt/singularity/cachedir
+
+DS=$(date +%Y%m%d_%H%M%S)
+UUID=${DS}_${RANDOM}
+export TMPDIR=/localscratch/bic/socci/SMap/$UUID
+#export TMPDIR=/scratch/test01/bic/socci/SMap/$UUID
 
 NF_LOCAL_CONFIG=iris.config
 
@@ -82,6 +86,7 @@ INPUT=$(realpath $1)
 LOG=runSarekHuman.log
 ODIR=sbam
 
+echo -e "TMPDIR: $TMPDIR" | tee -a $LOG
 echo -e "GENOME: $GENOME" | tee -a $LOG
 echo -e "INPUT: $INPUT" | tee -a $LOG
 echo -e "ODIR: $ODIR" | tee -a $LOG
