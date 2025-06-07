@@ -8,8 +8,9 @@ export NXF_SINGULARITY_CACHEDIR=/scratch/test01/socci/opt/singularity/cachedir
 
 DS=$(date +%Y%m%d_%H%M%S)
 UUID=${DS}_${RANDOM}
-export TMPDIR=/localscratch/bic/socci/SMap/$UUID
-#export TMPDIR=/scratch/test01/bic/socci/SMap/$UUID
+#export TMPDIR=/localscratch/bic/socci/SMap/$UUID
+export TMPDIR=/scratch/test01/bic/socci/SMap/$UUID
+mkdir -p $TMPDIR
 
 NF_LOCAL_CONFIG=iris.config
 
