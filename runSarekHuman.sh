@@ -4,7 +4,8 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 OPWD=$(pwd -P)
 
 export PATH=$SDIR/bin:$PATH
-export NXF_SINGULARITY_CACHEDIR=/scratch/test01/socci/opt/singularity/cachedir
+export NXF_SINGULARITY_CACHEDIR=/scratch/test01/bic/socci/opt/singularity/cachedir
+mkdir -p $NXF_SINGULARITY_CACHEDIR
 
 DS=$(date +%Y%m%d_%H%M%S)
 UUID=${DS}_${RANDOM}
