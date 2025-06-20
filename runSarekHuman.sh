@@ -15,7 +15,7 @@ mkdir -p $TMPDIR
 
 WORKDIR=/scratch/core001/bic/socci/SMap/$UUID/work
 mkdir -p $WORKDIR
-ln -s $WORKDIR
+
 
 NF_LOCAL_CONFIG=iris.config
 
@@ -109,11 +109,12 @@ case $(ps -o stat= -p $$) in
 esac
 
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
+    -resume \
     -profile singularity \
     -c $SDIR/config/$NF_LOCAL_CONFIG \
+    -work-dir $WORKDIR \
     --genome $GENOME \
     --outdir $ODIR \
-    -resume \
     --input $INPUT \
     $ADDITIONAL_ARGS \
     2> ${LOG/.log/.err} \
@@ -135,11 +136,12 @@ ADDITIONAL_ARGS: $ADDITIONAL_ARGS
 Script: $0 $*
 
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
+    -resume \
     -profile singularity \
     -c $SDIR/config/$NF_LOCAL_CONFIG \
+    -work-dir $WORKDIR \
     --genome $GENOME \
     --outdir $ODIR \
-    -resume \
     --input $INPUT \
     $ADDITIONAL_ARGS
     
