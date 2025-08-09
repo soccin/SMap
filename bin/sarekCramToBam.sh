@@ -1,13 +1,21 @@
 #!/bin/bash
-
-# BSUB: -o LSF/ -J C2B -n 18 -W 12:00 -R cmorsc1
+#SBATCH -J SarekC2B
+#SBATCH -o SLM/sarekC2B.%j.out
+#SBATCH -c 18
+#SBATCH -t 48:00:00
+#SBATCH --mem 18G
+#SBATCH --partition test01
 
 if [ "$#" != "1" ]; then
     echo -e "\n\tusage: sarekCramToBam.sh FILE.cram\n"
     exit
 fi
 
-SDIR=$(dirname "$(readlink -f "$0")")
+if [ -n "${SBATCH_SCRIPT_DIR}" ]; then
+    SDIR="${SBATCH_SCRIPT_DIR}"
+else
+    SDIR=$(dirname "$(readlink -f "$0")")
+fi
 
 module load samtools
 
@@ -19,32 +27,12 @@ else
     ODIR=$(dirname $CRAM)
 fi
 
-SM=$(
-    samtools view -H $CRAM \
-    | egrep "^@RG" \
-    | head -1 \
-    | tr '\t' '\n' \
-    | fgrep SM: \
-    | sed 's/SM://'
-    )
-
-ODIR=$ODIR/$SM
-mkdir -p $ODIR
-
 GENOME=$($SDIR/getGenomeBuildBAM.sh $CRAM)
 
 case $GENOME in
 
     b37)
-    GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/b37/b37.fasta
-    ;;
-
-    GRCh38)
-    GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/GRCh38_1kg/GRCh38_full_analysis_set_plus_decoy_hla.fa
-    ;;
-
-    GRC_m38)
-    GENOME_FILE=/rtsess01/compute/juno/bic/ROOT/rscr/references/Mus_musculus/BIC_MSK/GRCm38/Sequence/WholeGenomeFasta/GRCm38.fa
+    GENOME_FILE=/data1/core001/rsrc/genomic/mskcc-igenomes/igenomes/Homo_sapiens/GATK/GRCh37/Sequence/WholeGenomeFasta/human_g1k_v37_decoy.fasta
     ;;
 
     *)
@@ -54,6 +42,25 @@ case $GENOME in
 
 esac
 
-samtools view -@ 16 -T $GENOME_FILE -b $CRAM -o $ODIR/${SM}.smap.bam
+#
+# Sarek puts the correct sample name in LB:
+#
+SM=$(
+    samtools view -H $CRAM \
+    | egrep "^@RG" \
+    | head -1 \
+    | tr '\t' '\n' \
+    | fgrep LB: \
+    | sed 's/LB://'
+    )
+
+ODIR=$ODIR/$SM
+mkdir -p $ODIR
+
+samtools view -H $CRAM >$ODIR/header.sam
+$SDIR/fix_sarek_headers.py $ODIR/header.sam
+
+samtools reheader $ODIR/header.headfix.sam $CRAM \
+  | samtools view -@ 16 -T $GENOME_FILE -b - -o $ODIR/${SM}.smap.bam
 samtools index -@ 16 $ODIR/${SM}.smap.bam
 
