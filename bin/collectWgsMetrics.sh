@@ -7,7 +7,11 @@
 #SBATCH --partition test01
 
 
-SDIR=$(dirname "$(readlink -f "$0")")
+if [ -n "${SBATCH_SCRIPT_DIR}" ]; then
+    SDIR="${SBATCH_SCRIPT_DIR}"
+else
+    SDIR=$(dirname "$(readlink -f "$0")")
+fi
 
 if [ "$#" != "1" ]; then
     echo -e "\n   usage: [sbatch] collectWgsMetrics FILE.bam\n"
