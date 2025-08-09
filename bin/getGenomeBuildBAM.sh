@@ -7,10 +7,7 @@ if [ "$#" != "1" ]; then
     exit
 fi
 
-if ! [ -x "$(command -v samtools)" ]; then
-    >&2 echo -e "\n\n\tsamtools not in current path\n\n"
-    exit -1
-fi
+module load samtools
 
 GENOME_MD5=$(samtools view -H $1 | egrep "^@SQ" | cut -f-3 | sort  | md5sum - | awk '{print $1}')
 
