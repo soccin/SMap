@@ -3,9 +3,26 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 OPWD=$(pwd -P)
 
-export NXF_SINGULARITY_CACHEDIR=/rtsess01/compute/juno/bic/ROOT/opt/singularity/cachedir_socci
-export TMPDIR=/scratch/socci
 export PATH=$SDIR/bin:$PATH
+export NXF_SINGULARITY_CACHEDIR=/scratch/core001/bic/socci/opt/singularity/cachedir
+mkdir -p $NXF_SINGULARITY_CACHEDIR
+
+DS=$(date +%Y%m%d_%H%M%S)
+UUID=${DS}_${RANDOM}
+#export TMPDIR=/localscratch/bic/socci/SMap/$UUID
+export TMPDIR=/scratch/core001/bic/socci/SMap/$UUID
+mkdir -p $TMPDIR
+
+# Not sure if this is needed now what we have `process.scratch=true`
+# But leave for now anyway
+#
+export SINGULARITY_TMPDIR=$TMPDIR
+
+WORKDIR=/scratch/core001/bic/socci/SMap/$UUID/work
+mkdir -p $WORKDIR
+
+
+NF_LOCAL_CONFIG=iris.config
 
 haveNextflow=$(which nextflow 2>/dev/null)
 
@@ -80,6 +97,7 @@ INPUT=$(realpath $1)
 LOG=runSarekHuman.log
 ODIR=sbam
 
+echo -e "TMPDIR: $TMPDIR" | tee -a $LOG
 echo -e "GENOME: $GENOME" | tee -a $LOG
 echo -e "INPUT: $INPUT" | tee -a $LOG
 echo -e "ODIR: $ODIR" | tee -a $LOG
@@ -96,11 +114,12 @@ case $(ps -o stat= -p $$) in
 esac
 
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
+    -resume \
     -profile singularity \
-    -c $SDIR/config/neo.config \
+    -c $SDIR/config/$NF_LOCAL_CONFIG \
+    -work-dir $WORKDIR \
     --genome $GENOME \
     --outdir $ODIR \
-    -resume \
     --input $INPUT \
     $ADDITIONAL_ARGS \
     2> ${LOG/.log/.err} \
@@ -122,11 +141,12 @@ ADDITIONAL_ARGS: $ADDITIONAL_ARGS
 Script: $0 $*
 
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
+    -resume \
     -profile singularity \
-    -c $SDIR/config/neo.config \
+    -c $SDIR/config/$NF_LOCAL_CONFIG \
+    -work-dir $WORKDIR \
     --genome $GENOME \
     --outdir $ODIR \
-    -resume \
     --input $INPUT \
     $ADDITIONAL_ARGS
     

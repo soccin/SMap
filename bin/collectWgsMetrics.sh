@@ -1,10 +1,20 @@
 #!/bin/bash
+#SBATCH -J Picard-CollectWgsMetrics
+#SBATCH -o SLM/picardCWGS.%j.out
+#SBATCH -c 3
+#SBATCH -t 48:00:00
+#SBATCH --mem 32G
+#SBATCH --partition test01
 
-SDIR=$(dirname "$(readlink -f "$0")")
+
+if [ -n "${SBATCH_SCRIPT_DIR}" ]; then
+    SDIR="${SBATCH_SCRIPT_DIR}"
+else
+    SDIR=$(dirname "$(readlink -f "$0")")
+fi
 
 if [ "$#" != "1" ]; then
-    echo -e "\n   usage: collectWgsMetrics FILE.bam\n"
-    echo -e '      #BSUB: -n 8 -R "rusage[mem=4]" -W 24:00 \n\n'
+    echo -e "\n   usage: [sbatch] collectWgsMetrics FILE.bam\n"
     exit
 fi
 
@@ -28,7 +38,7 @@ GENOME=$($SDIR/getGenomeBuildBAM.sh $BAM)
 case $GENOME in
 
     b37)
-    GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/b37/b37.fasta
+    GENOME_FILE=/data1/core001/rsrc/genomic/mskcc-igenomes/igenomes/Homo_sapiens/GATK/GRCh37/Sequence/WholeGenomeFasta/human_g1k_v37_decoy.fasta
     ;;
 
     *)
@@ -47,7 +57,9 @@ AVG_READ_LEN=$(
         | awk '{s+=$1/10000}END{print s}'
     )
 
-picardV2 CollectWgsMetrics \
+PICARD_JAR=/usersoftware/core001/common/RHEL_8/picard/3.4.0/picard.jar
+java -jar $PICARD_JAR \
+    CollectWgsMetrics \
     READ_LENGTH=$AVG_READ_LEN \
     USE_FAST_ALGORITHM=true \
     COVERAGE_CAP=1000 \
