@@ -13,6 +13,11 @@ UUID=${DS}_${RANDOM}
 export TMPDIR=/scratch/core001/bic/socci/SMap/$UUID
 mkdir -p $TMPDIR
 
+# Not sure if this is needed now what we have `process.scratch=true`
+# But leave for now anyway
+#
+export SINGULARITY_TMPDIR=$TMPDIR
+
 WORKDIR=/scratch/core001/bic/socci/SMap/$UUID/work
 mkdir -p $WORKDIR
 
