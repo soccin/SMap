@@ -2,7 +2,7 @@
 
 Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples. 
 
-## Branch: iris
+## Branch: devs/iris
 
 Customization for iris cluster
 
