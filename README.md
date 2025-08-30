@@ -2,19 +2,32 @@
 
 Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples. 
 
-## Branch: devs/iris
+## Version: 2.2.0
 
-Customization for iris cluster
+Current release with SLURM optimizations, SAM header processing tools, and enhanced documentation.
 
-## Version: 2.1.1
+See [VERSION.md](VERSION.md) for complete version history and [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 
-- Added B38
+## Architecture
 
-## Version: 2.0.3
+This version uses the dev branch of `soccin/sarek` based on `v3.4.4` with Nextflow compatibility fixes.
 
-This version is using the devs branch of `soccin/sarek`. Stay on this branch so my work hopefully does not get broadcasted on the `nfcore/sarek` repo. This version of `sarek` is based on `v3.4.4` but fixes a bug that occurs with the latest version of nextflow.
+### Sarek Submodule
+- **Commit**: 25a829b6
+- **Tag**: 3.4.4-A~1  
+- **Origin**: soccin/sarek
+- **Branch**: dev
 
-This version has an updated version of `config/neo.config` that is fixed to work with JUNO's LSF config specificially the memory settings. To get things to work properly we set:
+### Memory Configuration Requirements
+
+For LSF compatibility, process memory divided by CPU count must equal integer values:
+```
+memory/cpus == 1,2,3,...
+```
+Not needed for SLURM. Also need to set the `JobMem` and `TaskReserve` properly.
+Again only for LSF.
+
+### Executor Configuration
 ```
 executor {
   name = "lsf"
@@ -22,7 +35,10 @@ executor {
   perTaskReserve = true
 }
 ```
-*N.B.*, In the process blocks `memory` is **TOTAL MEMORY** which will get divided by the number of cpus. There appears to be a constraint that this needs to be an integer, i.e.;
+
+For SLURM on IRIS to make sure the `/tmp` is not used need to set
+scratch in process
 ```
-	memory/cpus == 1,2,3,...
-```
+process {
+  scratch = false 
+}

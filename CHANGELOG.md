@@ -1,11 +1,13 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ## [Unreleased]
+
+### Added
+- Coming soon...
+
+## [2.2.0] - 2025-08-29
+
+**Sarek Submodule**: commit 25a829b6, tag 3.4.4-A~1, origin soccin/sarek, branch dev
 
 ### Fixed
 - **SLURM Resource Allocation**: Fixed memory/CPU ratio requirements for SLURM scheduler compatibility
@@ -37,4 +39,17 @@ The iris cluster configuration now properly handles:
 
 ## Previous Versions
 
+### [2.1.1] - Previous
+- Added B38 genome support
+
+### [2.0.3] - Previous
+- Using devs branch of soccin/sarek based on v3.4.4
+- Fixed Nextflow compatibility issues
+- Updated LSF/SLURM memory configuration requirements
+
+---
+
 This changelog was created to track recent improvements. For historical changes, see git commit history.
+
+[Unreleased]: https://github.com/soccin/SMap/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/soccin/SMap/releases/tag/v2.2.0
