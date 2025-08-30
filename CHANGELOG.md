@@ -1,11 +1,6 @@
 # Changelog
 
-## [Unreleased]
-
-### Added
-- Coming soon...
-
-## [2.2.0] - 2025-08-29
+## [2.2.0] - 2025-08-29 - First Official Release
 
 **Sarek Submodule**: commit 25a829b6, tag 3.4.4-A~1, origin soccin/sarek, branch dev
 
@@ -49,7 +44,6 @@ The iris cluster configuration now properly handles:
 
 ---
 
-This changelog was created to track recent improvements. For historical changes, see git commit history.
+**Note**: This is the first official release with proper versioning and changelog tracking. Previous version numbers (2.1.1, 2.0.3) were development versions. For historical changes before v2.2.0, see git commit history.
 
-[Unreleased]: https://github.com/soccin/SMap/compare/v2.2.0...HEAD
 [2.2.0]: https://github.com/soccin/SMap/releases/tag/v2.2.0
