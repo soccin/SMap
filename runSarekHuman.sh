@@ -4,25 +4,6 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 OPWD=$(pwd -P)
 
 export PATH=$SDIR/bin:$PATH
-export NXF_SINGULARITY_CACHEDIR=/scratch/core001/bic/socci/opt/singularity/cachedir
-mkdir -p $NXF_SINGULARITY_CACHEDIR
-
-DS=$(date +%Y%m%d_%H%M%S)
-UUID=${DS}_${RANDOM}
-#export TMPDIR=/localscratch/bic/socci/SMap/$UUID
-export TMPDIR=/scratch/core001/bic/socci/SMap/$UUID
-mkdir -p $TMPDIR
-
-# Not sure if this is needed now what we have `process.scratch=true`
-# But leave for now anyway
-#
-export SINGULARITY_TMPDIR=$TMPDIR
-
-WORKDIR=/scratch/core001/bic/socci/SMap/$UUID/work
-mkdir -p $WORKDIR
-
-
-NF_LOCAL_CONFIG=iris.config
 
 haveNextflow=$(which nextflow 2>/dev/null)
 
@@ -30,6 +11,38 @@ if [ "$haveNextflow" == "" ]; then
     echo -e "\n\n   Need to install nextflow; see docs\n\n"
     exit 1
 fi
+
+DS=$(date +%Y%m%d_%H%M%S)
+UUID=${DS}_${RANDOM}
+
+. $SDIR/bin/getClusterName.sh
+echo \$CLUSTER=$CLUSTER
+if [ "$CLUSTER" == "IRIS" ]; then
+
+  export NXF_SINGULARITY_CACHEDIR=/scratch/core001/bic/socci/opt/singularity/cachedir
+  export TMPDIR=/scratch/core001/bic/socci/SMap/$UUID
+  export WORKDIR=/scratch/core001/bic/socci/SMap/$UUID/work
+  NF_LOCAL_CONFIG=iris.config
+
+elif [ "$CLUSTER" == "JUNO" ]; then
+
+  export NXF_SINGULARITY_CACHEDIR=/rtsess01/compute/juno/bic/ROOT/opt/singularity/cachedir_socci
+  export TMPDIR=/scratch/socci
+  export WORKDIR=work/$UUID
+  NF_LOCAL_CONFIG=neo.config
+
+else
+
+    echo -e "\nUnknown cluster: $CLUSTER\n"
+    exit 1
+
+fi
+
+export SINGULARITY_TMPDIR=$TMPDIR
+mkdir -p $TMPDIR
+mkdir -p $NXF_SINGULARITY_CACHEDIR
+mkdir -p $WORKDIR
+
 
 set -eu
 
@@ -135,8 +148,10 @@ SDIR: $SDIR
 GURL: $GURL
 GTAG: $GTAG
 PWD: $OPWD
+CLUSTER: $CLUSTER
 TMPDIR: $TMPDIR
 NXF_SINGULARITY_CACHEDIR: $NXF_SINGULARITY_CACHEDIR
+WORKDIR: $WORKDIR
 ADDITIONAL_ARGS: $ADDITIONAL_ARGS
 Script: $0 $*
 
