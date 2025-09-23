@@ -29,10 +29,21 @@ fi
 
 GENOME=$($SDIR/getGenomeBuildBAM.sh $CRAM)
 
+. $SDIR/getClusterName.sh
+
 case $GENOME in
 
     b37)
-    GENOME_FILE=/data1/core001/rsrc/genomic/mskcc-igenomes/igenomes/Homo_sapiens/GATK/GRCh37/Sequence/WholeGenomeFasta/human_g1k_v37_decoy.fasta
+
+    if [ "$CLUSTER" == "IRIS" ]; then
+        GENOME_FILE=/data1/core001/rsrc/genomic/mskcc-igenomes/igenomes/Homo_sapiens/GATK/GRCh37/Sequence/WholeGenomeFasta/human_g1k_v37_decoy.fasta
+    elif [ "$CLUSTER" == "JUNO" ]; then
+        GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/b37/b37.fasta
+    else
+        echo -e "\nUnknown cluster: $CLUSTER\n"
+        exit 1
+    fi
+
     ;;
 
     *)
