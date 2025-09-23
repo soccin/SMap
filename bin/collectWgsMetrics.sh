@@ -35,10 +35,21 @@ mkdir -p $ODIR
 
 GENOME=$($SDIR/getGenomeBuildBAM.sh $BAM)
 
+. $SDIR/getClusterName.sh
+
 case $GENOME in
 
     b37)
-    GENOME_FILE=/data1/core001/rsrc/genomic/mskcc-igenomes/igenomes/Homo_sapiens/GATK/GRCh37/Sequence/WholeGenomeFasta/human_g1k_v37_decoy.fasta
+
+    if [ "$CLUSTER" == "IRIS" ]; then
+        GENOME_FILE=/data1/core001/rsrc/genomic/mskcc-igenomes/igenomes/Homo_sapiens/GATK/GRCh37/Sequence/WholeGenomeFasta/human_g1k_v37_decoy.fasta
+    elif [ "$CLUSTER" == "JUNO" ]; then
+        GENOME_FILE=/juno/bic/depot/assemblies/H.sapiens/b37/b37.fasta
+    else
+        echo -e "\nUnknown cluster: $CLUSTER\n"
+        exit 1
+    fi
+
     ;;
 
     *)
@@ -57,7 +68,12 @@ AVG_READ_LEN=$(
         | awk '{s+=$1/10000}END{print s}'
     )
 
-PICARD_JAR=/usersoftware/core001/common/RHEL_8/picard/3.4.0/picard.jar
+if [ "$CLUSTER" == "IRIS" ]; then
+    PICARD_JAR=/usersoftware/core001/common/RHEL_8/picard/3.4.0/picard.jar
+elif [ "$CLUSTER" == "JUNO" ]; then
+    PICARD_JAR=/home/socci/Code/Picard/jar/2.25.5/picard.jar
+fi
+
 java -jar $PICARD_JAR \
     CollectWgsMetrics \
     READ_LENGTH=$AVG_READ_LEN \
