@@ -2,7 +2,7 @@
 #'
 #' @param fastq_file Path to FASTQ file
 #' @return Flow cell ID string in format "AXXXX_LNNN"
-get_fcid <- function(fastq_file) {
+get_lane <- function(fastq_file) {
   desc <- (readLines(fastq_file, 1) |> strsplit(":"))[[1]]
   sprintf("A%s_L%03d", desc[3], as.numeric(desc[4]))
 }
@@ -37,11 +37,11 @@ map0 <- read_csv(argv[1], col_names = FALSE, show_col_types = FALSE) |>
   mutate(
     patient = "",
     status = "",
-    fcid = get_fcid(fastq_1)
+    lane = get_lane(fastq_1)
   ) |>
-  select(patient, sample, status, fcid, fastq_1) |>
+  select(patient, sample, status, lane, fastq_1) |>
   mutate(fastq_2 = sub_r1_r2(fastq_1)) |>
-  arrange(sample, fcid)
+  arrange(sample, lane)
 
 if (!all(gsub("_R1_", "_R2_", map0$fastq_1) == map0$fastq_2)) {
   cat("\n\nFATAL ERROR: R1/R2 filename mismatch\n\n")
