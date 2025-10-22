@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J SMap.%j
+#SBATCH -J SMap
 #SBATCH -o SLM/SMap.%j.out
 #SBATCH -c 4
 #SBATCH -t 7-00:00:00
