@@ -12,7 +12,7 @@ PICARD_JAR=/usersoftware/core001/common/RHEL_8/picard/3.4.0/picard.jar
 BAM=$1
 BASE=$(basename ${BAM/.bam/})
 
-ODIR=metrics/picard/asm/$BASE
+ODIR=out/metrics/$BASE
 mkdir -p $ODIR
 
 java -jar $PICARD_JAR \
