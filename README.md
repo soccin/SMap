@@ -1,10 +1,10 @@
 # SMap
 
-Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples. 
+Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples.
 
-## Version: 2.2.0
+## Version: 2.3.0
 
-Current release with SLURM optimizations, SAM header processing tools, and enhanced documentation.
+Current release with multi-cluster support, new QC tools, and enhanced format conversion utilities.
 
 See [VERSION.md](VERSION.md) for complete version history and [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 
