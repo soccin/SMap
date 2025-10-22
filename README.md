@@ -36,9 +36,12 @@ executor {
 }
 ```
 
-For SLURM on IRIS to make sure the `/tmp` is not used need to set
-scratch in process
+For SLURM on IRIS to avoid `/tmp` usage, explicitly set scratch to a
+directory (not /tmp) as TMPDIR is not getting properly set on IRIS/SLURM
+or set `scratch=false` to use work directory
 ```
 process {
-  scratch = false 
+  scratch = "/localscratch/core001/soccin"
+  // or scratch=false to use work directory
 }
+```
