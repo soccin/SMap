@@ -1,10 +1,10 @@
 # SMap
 
-Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples. 
+Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples.
 
-## Version: 2.2.0
+## Version: 2.3.0
 
-Current release with SLURM optimizations, SAM header processing tools, and enhanced documentation.
+Current release with multi-cluster support, new QC tools, and enhanced format conversion utilities.
 
 See [VERSION.md](VERSION.md) for complete version history and [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 
@@ -36,9 +36,12 @@ executor {
 }
 ```
 
-For SLURM on IRIS to make sure the `/tmp` is not used need to set
-scratch in process
+For SLURM on IRIS to avoid `/tmp` usage, explicitly set scratch to a
+directory (not /tmp) as TMPDIR is not getting properly set on IRIS/SLURM
+or set `scratch=false` to use work directory
 ```
 process {
-  scratch = false 
+  scratch = "/localscratch/core001/soccin"
+  // or scratch=false to use work directory
 }
+```

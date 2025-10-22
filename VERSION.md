@@ -1,9 +1,9 @@
 # SMap Version Information
 
 ## Version:
-- tag: 2.2.0
-- base-branch: devs/iris
-- date: 2025-08-29
+- tag: 2.3.0
+- base-branch: master
+- date: 2025-10-22
 
 ## Submodules
 
