@@ -30,7 +30,32 @@ SM=$(
     | sed 's/SM://'
     )
 
-ODIR=out/metrics/$SM
+LB=$(
+    samtools view -H $BAM \
+    | egrep "^@RG" \
+    | head -1 \
+    | tr '\t' '\n' \
+    | fgrep LB: \
+    | sed 's/LB://'
+    )
+
+case $BAM in
+    *.cram)
+        # If a CRAM from SAREK and SM is broken
+        SID=$LB
+        ;;
+    *.bam)
+        # For BAM's we have fixed so SM is correct
+        SID=$SM
+        ;;
+    *)
+        # Error otherwise
+        echo -e "\n\tERROR: Unknown file type\n" >&2
+        exit 1
+        ;;
+esac
+
+ODIR=out/metrics/$SID
 mkdir -p $ODIR
 
 GENOME=$($SDIR/getGenomeBuildBAM.sh $BAM)
@@ -79,4 +104,4 @@ java -jar $PICARD_JAR \
     READ_LENGTH=$AVG_READ_LEN \
     USE_FAST_ALGORITHM=true \
     COVERAGE_CAP=1000 \
-    R=$GENOME_FILE I=$BAM O=$ODIR/$(basename ${BAM} | perl -pe 's/(.bam|.cram)$/.wgs.txt/')
+    R=$GENOME_FILE I=$BAM O=$ODIR/${SID}.wgs.txt
