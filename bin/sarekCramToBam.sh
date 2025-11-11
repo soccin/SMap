@@ -53,6 +53,8 @@ case $GENOME in
 
 esac
 
+set -euo pipefail
+echo "Start: sarekCramToBam $CRAM"
 #
 # Sarek puts the correct sample name in LB:
 #
@@ -75,3 +77,4 @@ samtools reheader $ODIR/header.headfix.sam $CRAM \
   | samtools view -@ 16 -T $GENOME_FILE -b - -o $ODIR/${SM}.smap.bam
 samtools index -@ 16 $ODIR/${SM}.smap.bam
 
+echo "End: sarekCramToBam $CRAM"
