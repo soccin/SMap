@@ -21,23 +21,11 @@ fi
 BAM=$1
 
 module load samtools
-SM=$(
-    samtools view -H $BAM \
-    | egrep "^@RG" \
-    | head -1 \
-    | tr '\t' '\n' \
-    | fgrep SM: \
-    | sed 's/SM://'
-    )
 
-LB=$(
-    samtools view -H $BAM \
-    | egrep "^@RG" \
-    | head -1 \
-    | tr '\t' '\n' \
-    | fgrep LB: \
-    | sed 's/LB://'
-    )
+. $SDIR/samUtils.sh
+
+SM=$(get_rg_tag_from_bam "$BAM" "SM")
+LB=$(get_rg_tag_from_bam "$BAM" "LB")
 
 case $BAM in
     *.cram)
@@ -84,7 +72,7 @@ case $GENOME in
 
 esac
 
-set -euo pipefail
+set -eu
 echo "Start: collectWgsMetrics $BAM"
 
 module load samtools
