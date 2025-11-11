@@ -53,19 +53,21 @@ case $GENOME in
 
 esac
 
+
+
 set -euo pipefail
 echo "Start: sarekCramToBam $CRAM"
+echo "SDIR: $SDIR"
+
+. $SDIR/samUtils.sh
+
 #
 # Sarek puts the correct sample name in LB:
 #
-SM=$(
-    samtools view -H $CRAM \
-    | egrep "^@RG" \
-    | head -1 \
-    | tr '\t' '\n' \
-    | fgrep LB: \
-    | sed 's/LB://'
-    )
+
+SM=$(get_rg_tag_from_bam "$CRAM" "LB")
+
+echo "SM: $SM"
 
 ODIR=$ODIR/$SM
 mkdir -p $ODIR
