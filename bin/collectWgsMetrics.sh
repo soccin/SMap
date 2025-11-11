@@ -84,6 +84,9 @@ case $GENOME in
 
 esac
 
+set -euo pipefail
+echo "Start: collectWgsMetrics $BAM"
+
 module load samtools
 AVG_READ_LEN=$(
     samtools view $BAM \
@@ -105,3 +108,5 @@ java -jar $PICARD_JAR \
     USE_FAST_ALGORITHM=true \
     COVERAGE_CAP=1000 \
     R=$GENOME_FILE I=$BAM O=$ODIR/${SID}.wgs.txt
+
+echo "End: collectWgsMetrics $BAM"

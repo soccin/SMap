@@ -83,7 +83,8 @@ case $GENOME in
 
 esac
 
-
+set -euo pipefail
+echo "Start: collectAlignmentSummaryMetrics $BAM"
 
 ODIR=out/metrics/$SID
 mkdir -p $ODIR
@@ -94,4 +95,4 @@ java -jar $PICARD_JAR \
     -I $BAM \
     -O $ODIR/${SID}.asm.txt
 
-
+echo "End: collectAlignmentSummaryMetrics $BAM"
