@@ -55,6 +55,13 @@ else
 
 fi
 
+if [ "$#" == "0" ]; then
+    echo
+    echo "usage: runSarekHuman.sh [-g|--genome GATK.GRCh37|GATK.GRCh38] [-s|--skip_bsqr] input_sarek.csv"
+    echo
+    exit
+fi
+
 export SINGULARITY_TMPDIR=$TMPDIR
 mkdir -p $TMPDIR
 mkdir -p $NXF_SINGULARITY_CACHEDIR
@@ -109,13 +116,6 @@ while true; do
             ;;
     esac
 done
-
-if [ "$#" -ne "1" ]; then
-    echo
-    echo "usage: runSarekHuman.sh [-g|--genome GATK.GRCh37|GATK.GRCh38] [-s|--skip_bsqr] input_sarek.csv"
-    echo
-    exit
-fi
 
 if [ "$GENOME" != "GATK.GRCh37" ]  && [ "$GENOME" != "GATK.GRCh38" ]; then
     echo -e "\n\n   Invalid genome: $GENOME"
