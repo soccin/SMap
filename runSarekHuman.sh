@@ -43,7 +43,7 @@ if [ "$CLUSTER" == "IRIS" ]; then
 
 elif [ "$CLUSTER" == "JUNO" ]; then
 
-  export NXF_SINGULARITY_CACHEDIR=/rtsess01/compute/juno/bic/ROOT/opt/singularity/cachedir_socci
+  export NXF_SINGULARITY_CACHEDIR=/juno/bic/work/socci/opt/singularity/cachedir_socci
   export TMPDIR=/scratch/socci
   export WORKDIR=work/$UUID
   NF_LOCAL_CONFIG=neo.config
