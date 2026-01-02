@@ -43,7 +43,8 @@ if [ "$CLUSTER" == "IRIS" ]; then
 
 elif [ "$CLUSTER" == "JUNO" ]; then
 
-  export NXF_SINGULARITY_CACHEDIR=/rtsess01/compute/juno/bic/ROOT/opt/singularity/cachedir_socci
+  export NXF_SINGULARITY_CACHEDIR=/juno/bic/work/socci/opt/singularity/cachedir_socci
+  export SINGULARITY_CACHEDIR=/juno/bic/work/socci/opt/singularity/cachedir_socci
   export TMPDIR=/scratch/socci
   export WORKDIR=work/$UUID
   NF_LOCAL_CONFIG=neo.config
@@ -143,6 +144,13 @@ case $(ps -o stat= -p $$) in
   *) ANSI_LOG="false" ;;
 esac
 
+INTERVALS_ARG=""
+if [ "$GENOME" == "GATK.GRCh37" ]; then
+    # Workaround for nf-core/sarek v3.7.1 bug: GRCh37 intervals file uses .list extension
+    # but schema validation only accepts .bed or .interval_list extensions
+    INTERVALS_ARG="--intervals $SDIR/config/intervals/wgs_calling_regions_Sarek.GRCh37.bed"
+fi
+
 nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     -resume \
     -profile singularity \
@@ -151,6 +159,7 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --genome $GENOME \
     --outdir $ODIR \
     --input $INPUT \
+    $INTERVALS_ARG \
     $ADDITIONAL_ARGS \
     2> ${LOG/.log/.err} \
     | tee -a $LOG
@@ -180,6 +189,7 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --genome $GENOME \
     --outdir $ODIR \
     --input $INPUT \
+    $INTERVALS_ARG \
     $ADDITIONAL_ARGS
-    
+
 END_VERSION

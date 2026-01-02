@@ -1,14 +1,17 @@
 # SMap Version Information
 
 ## Version:
-- tag: 2.3.0
+- tag: 3.0.0
 - base-branch: master
-- date: 2025-10-22
+- date: 2026-01-02
 
 ## Submodules
 
 ### sarek
-- commit: 25a829b6
-- tag: 3.4.4-A~1
-- origin: soccin/sarek
-- branch: dev
+- commit: 20f41d1ce
+- tag: 3.7.1
+- origin: nf-core/sarek (official)
+- branch: master
+
+## Requirements
+- Nextflow: >= 25.10.2

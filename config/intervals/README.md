@@ -1,0 +1,1 @@
+Latest version of sarek seems to have dropped support for .list (chr:start-stop) format and now only accepts .bed or picard .intgerval_list formats. But B37 does not seem to have that so we need to create it locally. 
