@@ -4,7 +4,7 @@
 #SBATCH -c 18
 #SBATCH -t 48:00:00
 #SBATCH --mem 18G
-#SBATCH --partition test01
+#SBATCH --partition cmobic_cpu,cmobic_pipeline,bic_gpu
 
 if [ "$#" != "1" ]; then
     echo -e "\n\tusage: sarekCramToBam.sh FILE.cram\n"
