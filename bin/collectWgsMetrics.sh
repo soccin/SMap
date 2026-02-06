@@ -78,10 +78,10 @@ echo "Start: collectWgsMetrics $BAM"
 module load samtools
 AVG_READ_LEN=$(
     samtools view $BAM \
-        | head -10000 \
+        | head -100000 \
         | cut -f10 \
         | perl -ne 'print length($_),"\n"' \
-        | awk '{s+=$1/10000}END{print s}'
+        | awk '{s+=$1/100000}END{printf("%d", s+0.5)}'
     )
 
 if [ "$CLUSTER" == "IRIS" ]; then
