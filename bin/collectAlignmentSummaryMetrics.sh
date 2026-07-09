@@ -4,7 +4,7 @@
 #SBATCH -c 3
 #SBATCH -t 24:00:00
 #SBATCH --mem 4096M
-#SBATCH --partition cmobic_cpu,cmobic_pipeline
+#SBATCH --partition cmobic_cpu
 
 mkdir -p SLM
 

@@ -4,7 +4,7 @@
 #SBATCH -c 3
 #SBATCH -t 48:00:00
 #SBATCH --mem 32G
-#SBATCH --partition cmobic_cpu,cmobic_pipeline
+#SBATCH --partition cmobic_cpu
 
 
 if [ -n "${SBATCH_SCRIPT_DIR}" ]; then
