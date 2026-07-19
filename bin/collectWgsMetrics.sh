@@ -87,7 +87,7 @@ AVG_READ_LEN=$(
 if [ "$CLUSTER" == "IRIS" ]; then
     PICARD_JAR=/usersoftware/core001/common/RHEL_8/picard/3.4.0/picard.jar
 elif [ "$CLUSTER" == "JUNO" ]; then
-    PICARD_JAR=/home/socci/Code/Picard/jar/2.25.5/picard.jar
+    PICARD_JAR=/home/socci/Code/Picard/jar/3.4.0/picard.jar
 fi
 
 java -jar $PICARD_JAR \
