@@ -14,6 +14,11 @@ else
     SDIR=$(dirname "$(readlink -f "$0")")
 fi
 
+if [ "$#" != "1" ]; then
+    echo -e "\n   usage: [sbatch] collectAlignmentSummaryMetrics FILE.bam\n"
+    exit
+fi
+
 . $SDIR/getClusterName.sh
 
 if [ "$CLUSTER" == "IRIS" ]; then
