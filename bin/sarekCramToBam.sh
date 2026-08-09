@@ -73,7 +73,7 @@ ODIR=$ODIR/$SM
 mkdir -p $ODIR
 
 samtools view -H $CRAM >$ODIR/header.sam
-$SDIR/fix_sarek_headers.py $ODIR/header.sam
+$SDIR/fix_sarek_headers.py $ODIR/header.sam >$ODIR/header.headfix.sam
 
 samtools reheader $ODIR/header.headfix.sam $CRAM \
   | samtools view -@ 16 -T $GENOME_FILE -b - -o $ODIR/${SM}.smap.bam

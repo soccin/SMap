@@ -22,8 +22,7 @@ SMap is a collection of accessory scripts for running nf-core/sarek in mapping m
 - `bin/sarekCramToBam.sh` - Converts CRAM files to BAM format with header fixes
 - `bin/collectWgsMetrics.sh` - Runs Picard CollectWgsMetrics for quality assessment
 - `bin/getGenomeBuildBAM.sh` - Determines genome build from BAM/CRAM headers
-- `bin/fix_sarek_headers.py` - Python script for fixing Sarek-generated SAM headers
-- `bin/sam_header_editor.py` - General SAM header editing utility
+- `bin/fix_sarek_headers.py` - Swaps the SM and LB tags in @RG records of a Sarek SAM header (Sarek puts the sample name in LB); writes to stdout
 - `bin/bic2sarek.R` - R script for format conversion to Sarek input format
 - `bin/cleanup.sh` - Cleanup utilities
 
