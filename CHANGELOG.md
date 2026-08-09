@@ -1,5 +1,36 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- **Duplicate @RG/@PG Records in Merged CRAMs**: MERGE_CRAM now passes
+  `-c -p` to samtools merge on iris and neo
+  - Its inputs are interval slices of a single sample, so their @RG/@PG IDs
+    collide by construction; without `-c -p` samtools merge kept one copy per
+    interval under uniquified IDs and rewrote RG:Z on every read
+  - This is the real fix for the duplicate header records that
+    `bin/fix_sarek_headers.py` used to delete after the fact
+
+### Removed
+- **@PG Deduplication Hack**: `bin/fix_sarek_headers.py` no longer drops @PG
+  records with duplicate CL tags
+  - Rewriting a BAM header to hide a pipeline bug was the wrong fix: it left
+    the alignment records pointing at the uniquified IDs, and it reordered the
+    @PG records, breaking the PP chain
+  - The duplicates are gone at the source (see the MERGE_CRAM fix above), so
+    there is nothing left to deduplicate. Do not reintroduce this
+  - The script now does one thing: swap SM and LB in @RG records
+- **`bin/sam_header_editor.py`**: Deleted; it existed only to support the
+  deduplication hack and had no other caller in the repository
+  (supersedes the entry under [2.2.0])
+
+### Changed
+- **`bin/fix_sarek_headers.py`**: Writes the fixed header to stdout instead of
+  inventing a `.headfix.sam` filename; `sarekCramToBam.sh` now redirects
+  - Reports the number of swapped @RG records on stderr and exits non-zero if
+    there were none, so a Sarek change that stops putting the sample name in
+    LB fails loudly instead of producing a mislabelled BAM
+
 ## [3.0.0] - 2026-01-02
 
 **Sarek Submodule**: nf-core/sarek v3.7.1 (official), commit 20f41d1ce
