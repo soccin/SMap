@@ -2,14 +2,17 @@
 
 Accessory scripts to run nf-core/sarek in mapping mode. Optimized for WGS samples.
 
-## Version: 3.0.0
+## Version: 3.1.0
 
-Major release migrating to official nf-core/sarek v3.7.1. Includes workarounds for upstream validation bugs.
+Maintenance release: MERGE_CRAM preserves @RG/@PG IDs, simplified BAM header
+fixing, CollectInsertSizeMetrics QC tool, cluster/resource tuning, and
+Nextflow pinned to 25.10.x (< 26.0.0).
 
 See [VERSION.md](VERSION.md) for complete version history and [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 
 ### Requirements
-- **Nextflow**: >= 25.10.2
+- **Nextflow**: >= 25.10.2 and < 26.0.0 (setup installs 25.10.4)
+  - Nextflow 26.x is incompatible; do not upgrade past 25.x
 
 ## Architecture
 
