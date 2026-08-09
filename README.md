@@ -8,7 +8,7 @@ Maintenance release: MERGE_CRAM preserves @RG/@PG IDs, simplified BAM header
 fixing, CollectInsertSizeMetrics QC tool, cluster/resource tuning, and
 Nextflow pinned to 25.10.x (< 26.0.0).
 
-See [VERSION.md](VERSION.md) for complete version history and [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
+See [VERSION.md](VERSION.md) for the pinned submodule and requirements, and [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
 
 ### Requirements
 - **Nextflow**: >= 25.10.2 and < 26.0.0 (setup installs 25.10.4)
@@ -23,7 +23,7 @@ This version uses the official nf-core/sarek v3.7.1 with local workarounds for G
 - **Commit**: 20f41d1ce
 - **Tag**: 3.7.1
 - **Origin**: nf-core/sarek (official)
-- **Branch**: master
+- **Pinned**: submodule tracks the commit above, not a branch
 
 ### Memory Configuration Requirements
 

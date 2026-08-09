@@ -37,8 +37,8 @@
   - Nextflow 26 (26.04) makes the v2 strict syntax parser the default and
     tightens type handling; pipelines written against v1 syntax, including
     Sarek 3.7.1, do not run under it
-- **Iris SLURM Partition**: Default partition is `cmobic_cpu` only
-  (`cmobic_pipeline` removed from iris.config and utility scripts)
+- **Iris SLURM Partition**: `cmobic_pipeline` removed from `iris.config` and
+  utility scripts; `iris.config` now submits to `cmobic_cpu`
 - **JUNO Picard**: Metrics scripts use Picard 3.4.0 on JUNO (was 2.25.5),
   matching IRIS
 - **`bin/fix_sarek_headers.py`**: Writes the fixed header to stdout instead of
