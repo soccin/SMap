@@ -1,6 +1,16 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.0] - 2026-08-09
+
+**Sarek Submodule**: nf-core/sarek v3.7.1 (official), commit 20f41d1ce
+(unchanged from v3.0.0)
+
+### Added
+- **Picard CollectInsertSizeMetrics**: New `bin/collectInsertSizeMetrics.sh`
+  for insert-size QC on BAM files
+  - Writes metrics table and histogram PDF to `out/metrics/$SID`
+  - Rejects CRAM input up front (use `sarekCramToBam.sh` first)
+  - Unknown cluster is a hard error (PICARD_JAR must be set)
 
 ### Fixed
 - **Duplicate @RG/@PG Records in Merged CRAMs**: MERGE_CRAM now passes
@@ -10,6 +20,33 @@
     interval under uniquified IDs and rewrote RG:Z on every read
   - This is the real fix for the duplicate header records that
     `bin/fix_sarek_headers.py` used to delete after the fact
+- **WGS Read Length Estimate**: `collectWgsMetrics.sh` samples 100,000 reads
+  (was 10,000) and rounds average read length to nearest integer
+- **Iris MarkDuplicates Timeouts**: GATK4_MARKDUPLICATES time schedule is now
+  `48.h + 24.h * attempt` (attempt 1: 72h, was 42h)
+- **Neo MarkDuplicates I/O**: Raised MAX_RECORDS_IN_RAM to 80M and
+  SORTING_COLLECTION_SIZE_RATIO to 0.30 (matching iris)
+- **Neo FASTP Retries**: FASTP CPUs/memory/time now scale with `task.attempt`
+
+### Changed
+- **Nextflow Version Cap**: Require Nextflow >= 25.10.2 and < 26.0.0
+  - `00.SETUP.sh` pins `NXF_VER=25.10.4` for reproducible installs
+  - `iris.config` / `neo.config` set
+    `manifest.nextflowVersion = '!>=25.10.2, <26.0.0'`, so a 26.x runtime
+    aborts at launch
+  - Nextflow 26 (26.04) makes the v2 strict syntax parser the default and
+    tightens type handling; pipelines written against v1 syntax, including
+    Sarek 3.7.1, do not run under it
+- **Iris SLURM Partition**: Default partition is `cmobic_cpu` only
+  (`cmobic_pipeline` removed from iris.config and utility scripts)
+- **JUNO Picard**: Metrics scripts use Picard 3.4.0 on JUNO (was 2.25.5),
+  matching IRIS
+- **`bin/fix_sarek_headers.py`**: Writes the fixed header to stdout instead of
+  inventing a `.headfix.sam` filename; `sarekCramToBam.sh` now redirects
+  - Reports the number of swapped @RG records on stderr and exits non-zero if
+    there were none, so a Sarek change that stops putting the sample name in
+    LB fails loudly instead of producing a mislabelled BAM
+- **`bin/collectAlignmentSummaryMetrics.sh`**: Added the missing usage block
 
 ### Removed
 - **@PG Deduplication Hack**: `bin/fix_sarek_headers.py` no longer drops @PG
@@ -24,12 +61,13 @@
   deduplication hack and had no other caller in the repository
   (supersedes the entry under [2.2.0])
 
-### Changed
-- **`bin/fix_sarek_headers.py`**: Writes the fixed header to stdout instead of
-  inventing a `.headfix.sam` filename; `sarekCramToBam.sh` now redirects
-  - Reports the number of swapped @RG records on stderr and exits non-zero if
-    there were none, so a Sarek change that stops putting the sample name in
-    LB fails loudly instead of producing a mislabelled BAM
+### Recommendations
+- Re-run `00.SETUP.sh` (or install Nextflow 25.10.4) for a pinned runtime
+- Do **not** upgrade to Nextflow 26.x; stay on 25.10.x
+- Prefer the MERGE_CRAM fix over any post-hoc header rewriting for RG/PG issues
+- Use `collectInsertSizeMetrics.sh` alongside existing WGS/alignment metrics
+
+---
 
 ## [3.0.0] - 2026-01-02
 
@@ -188,5 +226,7 @@ The iris cluster configuration now properly handles:
 
 **Note**: This is the first official release with proper versioning and changelog tracking. Previous version numbers (2.1.1, 2.0.3) were development versions. For historical changes before v2.2.0, see git commit history.
 
+[3.1.0]: https://github.com/soccin/SMap/releases/tag/v3.1.0
+[3.0.0]: https://github.com/soccin/SMap/releases/tag/v3.0.0
 [2.3.0]: https://github.com/soccin/SMap/releases/tag/v2.3.0
 [2.2.0]: https://github.com/soccin/SMap/releases/tag/v2.2.0

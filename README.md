@@ -12,7 +12,8 @@ See [VERSION.md](VERSION.md) for complete version history and [CHANGELOG.md](CHA
 
 ### Requirements
 - **Nextflow**: >= 25.10.2 and < 26.0.0 (setup installs 25.10.4)
-  - Nextflow 26.x is incompatible; do not upgrade past 25.x
+  - Nextflow 26.x makes the v2 strict syntax parser the default and breaks
+    v1-syntax pipelines, Sarek 3.7.1 included. Do not upgrade past 25.x.
 
 ## Architecture
 
