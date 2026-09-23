@@ -148,8 +148,8 @@ esac
 
 INTERVALS_ARG=""
 if [ "$GENOME" == "GATK.GRCh37" ]; then
-    # Workaround for nf-core/sarek v3.7.1 bug: GRCh37 intervals file uses .list extension
-    # but schema validation only accepts .bed or .interval_list extensions
+    # Workaround for nf-core/sarek bug (still present in v3.9.0): GRCh37 intervals
+    # file uses .list extension but schema validation only accepts .bed or .interval_list
     INTERVALS_ARG="--intervals $SDIR/config/intervals/wgs_calling_regions_Sarek.GRCh37.bed"
 fi
 
@@ -161,6 +161,7 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --genome $GENOME \
     --outdir $ODIR \
     --input $INPUT \
+    --save_output_as_bam \
     $INTERVALS_ARG \
     $ADDITIONAL_ARGS \
     2> ${LOG/.log/.err} \
@@ -191,6 +192,7 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --genome $GENOME \
     --outdir $ODIR \
     --input $INPUT \
+    --save_output_as_bam \
     $INTERVALS_ARG \
     $ADDITIONAL_ARGS
 
