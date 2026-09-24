@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# samUtils.sh - Utility functions for working with SAM/BAM/CRAM files
+# samUtils.sh - Utility functions for working with SAM/BAM files
 #
 
 get_rg_tag_from_bam() {
