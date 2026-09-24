@@ -1,0 +1,6 @@
+# case	tumor_B3	expected @RG line (tab-separated, as bwa writes it)
+fastq_normal	no	@RG	ID:FC1.S1N.L001	PU:L001	LB:P1_S1N	SM:S1N	DS:human_g1k_v37_decoy.fasta	PL:ILLUMINA
+fastq_tumor	yes	@RG	ID:FC1.S1T.L002	PU:L002	LB:P1_S1T	SM:S1T	DS:human_g1k_v37_decoy.fasta	PL:ILLUMINA
+fastq_normal_cn	no	@RG	ID:FC1.S1N.L001	CN:MSKCC	PU:L001	LB:P1_S1N	SM:S1N	DS:human_g1k_v37_decoy.fasta	PL:ILLUMINA
+fastq_umi	no	@RG	ID:S1N	PU:consensus	LB:P1_S1N	SM:S1N	DS:human_g1k_v37_decoy.fasta	PL:ILLUMINA
+bam_input_tumor	yes	@RG	ID:S1T_L002	PU:L002	LB:P1_S1T	SM:S1T	DS:human_g1k_v37_decoy.fasta	PL:ILLUMINA
