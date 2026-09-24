@@ -24,13 +24,6 @@ BAM=$1
 case $BAM in
     *.bam)
         ;;
-    *.cram)
-        echo -e "\n\tERROR: CRAM input is not supported" >&2
-        echo -e "\tThis script does not resolve a reference FASTA, so Picard" >&2
-        echo -e "\tcannot decode a CRAM. Convert it first:\n" >&2
-        echo -e "\t    $SDIR/sarekCramToBam.sh $BAM\n" >&2
-        exit 1
-        ;;
     *)
         echo -e "\n\tERROR: Unknown file type [${BAM}]; expected .bam\n" >&2
         exit 1
@@ -51,7 +44,7 @@ fi
 module load samtools
 . $SDIR/samUtils.sh
 
-# For BAM's we have fixed so SM is correct
+# SMap BAMs carry the sample name in SM (see config/read_group.config)
 SID=$(get_rg_tag_from_bam "$BAM" "SM")
 
 set -eu

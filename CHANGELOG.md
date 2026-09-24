@@ -1,5 +1,172 @@
 # Changelog
 
+## [4.0.0] - 2026-09-23
+
+**Sarek Submodule**: nf-core/sarek v3.9.0 (official), commit b97952e5b
+
+### BREAKING CHANGES
+- **BAM Output, No CRAM**: `runSarekHuman.sh` passes `--save_output_as_bam`.
+  No CRAM or CRAI files are written or published anywhere under `sbam/`
+  - `sbam/preprocessing/markduplicates/<id>/<id>.md.bam` and `.md.bam.bai`
+  - `sbam/preprocessing/recalibrated/<id>/<id>.recal.bam` and
+    `.recal.bam.bai` (not produced with `-s`)
+  - `sbam/csv/*.csv` restart files list the BAM paths
+  - MarkDuplicates metrics file is now `<id>.md.bam.metrics`
+    (was `<id>.md.cram.metrics`)
+  - Anything downstream that looks for `.cram` under `sbam/` must be updated
+- **SM/LB Swapped At Alignment**: BWA now writes `SM:<sample>` and
+  `LB:<patient>_<sample>` directly (Sarek writes `SM:<patient>_<sample>`,
+  `LB:<sample>`)
+  - Before 4.0.0 the swap was applied to the header by `sarekCramToBam.sh`
+    while converting the CRAM. That script and `fix_sarek_headers.py` are
+    retired (see Removed); the swap is in `config/read_group.config`
+  - These BAMs cannot be fed back into Sarek variant calling: its Mutect2
+    and Sentieon TNscope expect the normal to be named `<patient>_<sample>`
+- **Sarek Version**: v3.7.1 -> v3.9.0
+
+### Why Sarek 3.9.0
+- In 3.7.1, `--save_output_as_bam` with BQSR silently loses the
+  recalibrated BAMs on WGS runs split into intervals
+  - ApplyBQSR writes BAM, but the workflow only reads its CRAM output,
+    which is then empty
+  - No `recalibrated/*.recal.bam` and no `recalibrated.csv` are produced
+  - The merged BAM is named `<id>.sorted.bam` and is only published to
+    `mapped/` with `--save_mapped`; otherwise it stays in the work directory
+- 3.9.0 fixes this (nf-core/sarek#2154, closes #2149): the ApplyBQSR BAMs
+  are merged and published as `recal.bam`, and MarkDuplicates writes BAM
+  directly instead of CRAM followed by conversion
+
+### Added
+- **`config/read_group.config`**: Swaps SM and LB in the read group Sarek
+  passes to `bwa mem -R`; included by `iris.config` and `neo.config`
+  - Replaces Sarek's BWA `ext.args` (same selector as
+    `sarek/conf/modules/aligner.config`) with the same arguments and only
+    the read group changed, including `-B 3` for tumors
+  - The tags are right in the first BAM BWA writes, so `md.bam` and
+    `recal.bam` need no reheader and no extra BAM copy
+  - If the read group has no single SM/LB pair to swap, the run stops with
+    an error instead of writing mislabeled BAMs. This aborts the run even
+    under the iris/neo retry-then-ignore error strategy
+  - Re-check against Sarek's `aligner.config` on every Sarek update
+- **`tests/read_group/`**: Regression test for `read_group.config`. Run
+  `tests/read_group/run.sh` after every Sarek update
+  - Runs Sarek's real BWA_MEM module from the pinned submodule on a 3 kb
+    reference, with read groups built by a verbatim copy of Sarek's code
+    (FASTQ normal/tumor, with CN, UMI, BAM input)
+  - Checks the exact @RG line, RG:Z on every read, `-B 3` on tumors only,
+    and that a read group without LB stops the run
+  - Takes a few seconds; works on IRIS and JUNO
+- **Index Touch**: `runSarekHuman.sh` touches every `*.bai` under
+  `$ODIR/preprocessing` after Nextflow finishes
+  - Nextflow copies the small `.bai` before the large `.bam` finishes, so
+    the index ends up older than the data file and htslib warns
+    "The index file is older than the data file"
+  - Guarded by a directory check so a failed run does not stop the script
+    (`set -e`) before `runlog/cmd.sh.log` is written
+
+### Changed
+- **MarkDuplicates Index**: iris and neo `GATK4_MARKDUPLICATES` `ext.args`
+  add `--CREATE_INDEX true` when `--save_output_as_bam` is set
+  - Our `ext.args` replaces Sarek's, which is where 3.9.0 sets this flag.
+    Without it Picard writes no `.bai` and the bam/bai join fails
+- **BAM Merge After BQSR**: The MERGE_CRAM resources and `-c -p` moved to
+  `BAM_APPLYBQSR:BAM_MERGE_INDEX_SAMTOOLS:MERGE_BAM` on iris and neo
+  - In BAM mode this step replaces MERGE_CRAM, which no longer runs; same
+    reason for `-c -p` (see [3.1.0])
+  - The `CRAM_SAMPLEQC:CRAM_QC_RECAL:SAMTOOLS_STATS` selector stays: it is
+    Sarek's name for the recal QC step, which runs on the BAMs
+- **Metrics Scripts BAM Only**: `collectWgsMetrics.sh`,
+  `collectAlignmentSummaryMetrics.sh` and `collectInsertSizeMetrics.sh`
+  accept only `.bam` and name output by the `SM` tag
+  - The CRAM branch, which named output by `LB` because Sarek CRAMs had the
+    sample name there, is gone
+- **`bin/cleanup.sh`**: No longer matches `.cram` files in `work/`
+
+### Removed
+- **Post-Processing Scripts Retired to `bin/attic/`**:
+  `bin/sarekCramToBam.sh` and `bin/fix_sarek_headers.py`
+  - Sarek now writes BAM, so there is nothing to convert
+  - The SM/LB swap now happens at alignment, so there is nothing to fix;
+    running either script on 4.0.0 BAMs would swap the tags back
+  - Kept in `bin/attic/` for reference only; do not use them
+- **CRAM Support**: SMap no longer reads or writes CRAM anywhere (see
+  Changed for the metrics scripts, the MERGE_CRAM config and `cleanup.sh`)
+
+### Upstream Bugs Documented
+This release works around or documents these bugs in nf-core/sarek v3.9.0:
+1. **`csv/markduplicates.csv` Index Path**: Lists `<id>.md.bai`, but the
+   published file is `<id>.md.bam.bai`
+   - The CSV uses the index name Picard writes in the work directory; the
+     publish step renames it
+     (`subworkflows/local/channel_baserecalibrator_create_csv/main.nf:39`)
+   - Only matters when restarting with `--step prepare_recalibration` from
+     this CSV; `runSarekHuman.sh` never does. Still present on upstream `dev`
+   - `markduplicates_no_table.csv` and `recalibrated.csv` are correct
+2. **GRCh37 Intervals Validation**: Still present in 3.9.0; the local BED
+   workaround from [3.0.0] is kept
+3. **Index Older Than BAM**: See Index Touch above
+
+### Technical Details
+
+#### Behavior Unchanged From 3.7.1
+- ApplyBQSR only writes reads inside the calling intervals. The GRCh37
+  intervals leave out the `hs37d5` decoy contig, so those reads are in
+  `md.bam` but not in `recal.bam` (5.3% tumor, 4.6% normal in the test)
+- `recal.bam` is about 60% larger than `md.bam`: the sequencer stores
+  quality scores in 4 bins, and BQSR expands them to about 38 distinct
+  values, which compress worse
+- Sarek's read-group construction is identical to 3.7.1
+  (`SM:<patient>_<sample>`, `LB:<sample>`) and still requires `sample` to
+  be unique across the samplesheet; SMap swaps the tags at alignment
+- The SM/LB swap does not change mapping: MarkDuplicates groups by LB,
+  still one value per sample across all its lanes, and BQSR groups by
+  read group ID/PU, both unchanged
+
+#### New Upstream Plugin
+- Sarek 3.9.0 adds the `nf-core-utils@0.4.0` Nextflow plugin. The node
+  that launches Nextflow downloads it on the first run
+
+#### Testing
+- **Platform**: IRIS (SLURM)
+- **Genome**: GRCh37 (GATK.GRCh37)
+- **Samples**: One tumor/normal pair, WGS, with BQSR, 13 lanes each
+- **Run 1** (BAM output, before the SM/LB swap): 483 tasks completed, none
+  failed or retried
+  - No CRAM or CRAI files anywhere under `sbam/`; no CRAM conversion or
+    CRAM merge steps ran
+  - All four BAMs pass `samtools quickcheck`
+  - MarkDuplicates `@PG` shows `--CREATE_INDEX true`; the BAM merge `@PG`
+    shows `-c -p` and 19 threads, so both config entries matched
+  - Recal BAM `@RG`: one record per lane with original IDs; no duplicate
+    `@PG` IDs
+  - Per-contig read counts in `md.bam` and `recal.bam` match on every
+    contig except `hs37d5`; duplicate flags are preserved
+- **Run 2** (final release code, SM/LB swap): 409 tasks completed and 74
+  cached (FASTP, FASTQC, interval preparation), none failed; all 312 BWA
+  tasks ran fresh
+  - All four BAMs: 13 `@RG` records, each `SM:<sample>`,
+    `LB:<patient>_<sample>`; ID, PU, DS and PL unchanged
+  - Every bwa `@PG` command line carries the swapped read group; `-B 3`
+    on all tumor tasks, none on normal
+  - Mapped and unmapped read counts and chr22 duplicate count identical to
+    run 1, so the swap changed only the tags
+  - Every `.bai` newer than its BAM; no "index file is older" warning
+  - No CRAM or CRAI files
+- **`tests/read_group/run.sh`**: all 16 checks pass. With the swap broken
+  on purpose, all 5 `@RG` checks fail, so the test detects it
+
+### Recommendations
+- Update any downstream scripts that expect CRAM files or
+  `.md.cram.metrics` names
+- Run `git submodule update` after checking out this release so `sarek/`
+  moves to 3.9.0
+- Stay on Nextflow 25.10.x
+- Do not use the retired scripts in `bin/attic/` on 4.0.0 BAMs
+- After any Sarek update, run `tests/read_group/run.sh` and re-check
+  `config/read_group.config` against Sarek's `aligner.config`
+
+---
+
 ## [3.1.0] - 2026-08-09
 
 **Sarek Submodule**: nf-core/sarek v3.7.1 (official), commit 20f41d1ce
@@ -226,6 +393,7 @@ The iris cluster configuration now properly handles:
 
 **Note**: This is the first official release with proper versioning and changelog tracking. Previous version numbers (2.1.1, 2.0.3) were development versions. For historical changes before v2.2.0, see git commit history.
 
+[4.0.0]: https://github.com/soccin/SMap/releases/tag/v4.0.0
 [3.1.0]: https://github.com/soccin/SMap/releases/tag/v3.1.0
 [3.0.0]: https://github.com/soccin/SMap/releases/tag/v3.0.0
 [2.3.0]: https://github.com/soccin/SMap/releases/tag/v2.3.0

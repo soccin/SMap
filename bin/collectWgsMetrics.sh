@@ -24,24 +24,17 @@ module load samtools
 
 . $SDIR/samUtils.sh
 
-SM=$(get_rg_tag_from_bam "$BAM" "SM")
-LB=$(get_rg_tag_from_bam "$BAM" "LB")
-
 case $BAM in
-    *.cram)
-        # If a CRAM from SAREK and SM is broken
-        SID=$LB
-        ;;
     *.bam)
-        # For BAM's we have fixed so SM is correct
-        SID=$SM
         ;;
     *)
-        # Error otherwise
-        echo -e "\n\tERROR: Unknown file type\n" >&2
+        echo -e "\n\tERROR: Unknown file type [${BAM}]; expected .bam\n" >&2
         exit 1
         ;;
 esac
+
+# SMap BAMs carry the sample name in SM (see config/read_group.config)
+SID=$(get_rg_tag_from_bam "$BAM" "SM")
 
 ODIR=out/metrics/$SID
 mkdir -p $ODIR

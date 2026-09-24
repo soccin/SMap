@@ -148,8 +148,8 @@ esac
 
 INTERVALS_ARG=""
 if [ "$GENOME" == "GATK.GRCh37" ]; then
-    # Workaround for nf-core/sarek v3.7.1 bug: GRCh37 intervals file uses .list extension
-    # but schema validation only accepts .bed or .interval_list extensions
+    # Workaround for nf-core/sarek bug (still present in v3.9.0): GRCh37 intervals
+    # file uses .list extension but schema validation only accepts .bed or .interval_list
     INTERVALS_ARG="--intervals $SDIR/config/intervals/wgs_calling_regions_Sarek.GRCh37.bed"
 fi
 
@@ -161,10 +161,20 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --genome $GENOME \
     --outdir $ODIR \
     --input $INPUT \
+    --save_output_as_bam \
     $INTERVALS_ARG \
     $ADDITIONAL_ARGS \
     2> ${LOG/.log/.err} \
     | tee -a $LOG
+
+#
+# Nextflow publishes the .bai before the larger .bam finishes copying,
+# so the index ends up older than the data file and htslib warns.
+# Touch the indexes so they are newer than their BAMs.
+#
+if [ -d "$ODIR/preprocessing" ]; then
+    find $ODIR/preprocessing -name "*.bai" -exec touch {} +
+fi
 
 mkdir -p $ODIR/runlog
 
@@ -191,6 +201,7 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     --genome $GENOME \
     --outdir $ODIR \
     --input $INPUT \
+    --save_output_as_bam \
     $INTERVALS_ARG \
     $ADDITIONAL_ARGS
 
