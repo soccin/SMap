@@ -167,6 +167,15 @@ nextflow run $SDIR/sarek/main.nf -ansi-log $ANSI_LOG \
     2> ${LOG/.log/.err} \
     | tee -a $LOG
 
+#
+# Nextflow publishes the .bai before the larger .bam finishes copying,
+# so the index ends up older than the data file and htslib warns.
+# Touch the indexes so they are newer than their BAMs.
+#
+if [ -d "$ODIR/preprocessing" ]; then
+    find $ODIR/preprocessing -name "*.bai" -exec touch {} +
+fi
+
 mkdir -p $ODIR/runlog
 
 GTAG=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --long --tags --dirty="-UNCOMMITED" --always)
