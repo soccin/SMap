@@ -16,7 +16,8 @@ release; do not install unpinned latest.
 Nextflow 26 (26.04) makes the v2 strict syntax parser the default and
 tightens type handling. Pipelines written against v1 syntax, Sarek 3.7.1
 included, do not run under it. This is not a wait-and-retest situation:
-26.x requires the pipeline itself to be ported.
+26.x requires the pipeline itself to be ported. The cap is kept for the
+current Sarek 3.9.0, which has not been tested on 26.x.
 
 Manual install of a specific 25.10.x version:
 
@@ -43,6 +44,10 @@ If you already cloned without it:
 ```
 git submodule update --init
 ```
+
+After switching branches or pulling a release that moves the Sarek pin,
+run `git submodule update` as well. `git checkout` does not move the
+submodule, so `sarek/` stays on the old version until you do.
 
 That checks out the pinned Sarek commit. Do **not** `cd sarek` and check out
 a branch: that moves the submodule off the pinned commit and you are no
