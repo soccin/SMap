@@ -84,9 +84,21 @@ manifest <- read_csv(mfile, show_col_types = FALSE) %>%
   mutate(status = ifelse(type == "Tumor", 1, 0))
 
 # Combine FASTQ information with metadata to create Sarek input
+# Take the lane from the end of the file name (..._S83_L005_R1_001.fastq.gz);
+# sample names can contain _L<digits>_ too (e.g. CL_L091218_P5)
 sarek_input <- left_join(fdir, manifest) %>%
-  mutate(lane = cc(fcid, str_extract(fastq_1, "_(L\\d+)_", group = 1))) %>%
+  mutate(lane = cc(fcid, str_extract(fastq_1, "_(L\\d+)_R1_\\d+\\.fastq\\.gz$", group = 1))) %>%
   select(patient, sample, status, lane, matches("fastq"))
+
+# Sarek requires each patient/sample/lane combination to be unique
+dups <- sarek_input |>
+  count(patient, sample, lane) |>
+  filter(n > 1)
+if (nrow(dups) > 0) {
+  cat("\n\nFATAL ERROR: duplicate patient/sample/lane in Sarek input\n\n")
+  print(dups)
+  rlang::abort("FATAL ERROR")
+}
 
 write_csv(sarek_input, "input_sarek_somatic.csv")
 
